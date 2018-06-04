@@ -22,38 +22,47 @@ var server = http.createServer(function(request, response){
 
 
 
-
-
-
-
-
-
-
-
-
-  console.log('HTTP 路径\n' + path)
-  if(path == '/style'){
-    response.setHeader('content-Type','text/css ; charset=utf-8')
-    response.write('body{background-color:red;} h1{color:blue;}')
+if(path ==='/'){
+    var string = fs.readFileSync('./index.html','utf8')
+    var amount = fs.readFileSync('./db','utf-8')   //获取的是字符串
+    string = string.replace('&&&amount&&&',amount)  //用db中的数据来替换占位符
+    response.setHeader('Content-Tpye','text/html;charset=utf-8')
+    response.write(string)
     response.end()
-  }else if (path == '/script') {
-    response.setHeader('content-Type','text/javascript ; charset=utf-8')
-    response.write('alert("这是用js写的")')
+}else if(path ==='/style.css'){
+    var string = fs.readFileSync('./style.css','utf8')
+    response.setHeader('Content-Type','text/css')
+    response.end(string)
+}else if(path ==='/main.js'){
+    var string = fs.readFileSync('./main.js','utf8')
+    response.setHeader('Content-Type','text/javascript')
+    response.end(string) 
+}else if(path ==='/pay'){
+    var amount = fs.readFileSync('./db','utf8')
+    var newAmount = amount - 1
+    fs.writeFileSync('db',newAmount)
+    response.setHeader('Content-Type','application/javascript')
+    response.statusCode = 200
+    
+    response.write(`
+    yyy.call(undefined,'success')
+    `)
     response.end()
-  }
-  else if(path == '/index'){
-    response.setHeader('content-Type','text/html ; charset=utf-8')
-    response.write('<!Doctype>\n<html>'+
-    '<head><link rel = "stylesheet" href = "/style" ></head><body>'+
-    '<h1>H你好！<h1>'+
-    '<script src ="/script"></script>'+
-    '</body></html>')
-    response.end()
-  }
-  else{
+}
+else{
     response.statusCode = 404
-    response.end()
-  }
+    response.setHeader('Content-Type','text/html;charset=utf-8')
+    response.end('找不到对应，需要修改 server.js')
+}
+
+
+
+
+
+
+
+
+
   
 
 
